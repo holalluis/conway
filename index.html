@@ -2,14 +2,7 @@
   <meta charset=utf8>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Conway's game of life</title>
-  <!--vue
-    development version, includes helpful console warnings
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    production version, optimized for size and speed
-    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-  -->
   <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-
   <style>
     div.row{
       display:flex;
@@ -43,33 +36,37 @@
       <button @click="start_simulation()" :disabled="running || !Object.values(alive_cells).some(val=>val==true)">inicia</button>
       <button @click="stop_simulation()" :disabled="!running">stop</button>
       pas: {{this.current_frame}}
-
       &emsp; &emsp; | &emsp; &emsp;
       <button @click="set_all_next_states()" :disabled="running">+1 pas</button>
       &emsp; &emsp; | &emsp; &emsp;
-
       <button @click="set_all_random()">tot aleatori</button>
       <button @click="set_all_dead()">neteja tot</button>
     </div>
   </div><hr>
 
   <!--grid-->
-  <div class=row v-for="i in grid_size">
+  <div
+    class=row
+    v-for="i in grid_size"
+    @mousedown="paint_mode=true"
+    @mouseup="paint_mode=false"
+  >
     <div
       class=cell
       v-for="j in grid_size"
       :alive="check_alive(i-1,j-1)"
-      @click="click_cell(i-1,j-1)"
+      @mousedown="click_cell(i-1,j-1)"
+      @mouseenter="if(paint_mode) click_cell(i-1,j-1)"
     ></div>
   </div>
 </div>
 
-
 <script>
 let app=new Vue({el:"#app",
   data:{
-    grid_size:100,
-    timestep:50, //ms
+    grid_size:100, //tamany taula
+    timestep:100, //ms entre frames
+    paint_mode:false, //drag mouse mode per pintar els quadres
 
     //current state
     alive_cells:{
@@ -111,6 +108,7 @@ let app=new Vue({el:"#app",
           this.set_new_state(i,j,'dead');
         }
       }
+      this.current_frame=0;
       this.$forceUpdate();
     },
 
