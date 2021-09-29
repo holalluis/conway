@@ -25,17 +25,15 @@
     }
   </style>
 </head><body>
-<h1>
-  Conway's Game of Life
-  (<a href="https://github.com/holalluis/conway">github.com/holalluis/conway</a>)
-</h1>
+<h1>Conway's Game of Life</h1>
+<p><a href="https://github.com/holalluis/conway">github.com/holalluis/conway</a></p>
 <p>
   S'apliquen aquestes 2 normes a cada pas:
   <ol>
     <li>Si una casella té exactament 3 veïns, viu (casella blanca).
     <li>Si una casella té menys de 2 veïns, o més de 3 veïns, mor (casella negra).
   </ol>
-  Pots fer click a una casella negra per fer-la blanca.
+  Pots fer click a una casella per canviar el seu estat.
 </p><hr>
 
 <div id=app>
@@ -46,7 +44,10 @@
       <button @click="stop_simulation()" :disabled="!running">stop</button>
       pas: {{this.current_frame}}
 
-      &emsp;&emsp;
+      &emsp; &emsp; | &emsp; &emsp;
+      <button @click="set_all_next_states()" :disabled="running">+1 pas</button>
+      &emsp; &emsp; | &emsp; &emsp;
+
       <button @click="set_all_random()">tot aleatori</button>
       <button @click="set_all_dead()">neteja tot</button>
     </div>
@@ -67,8 +68,8 @@
 <script>
 let app=new Vue({el:"#app",
   data:{
-    grid_size:40,
-    timestep:150, //ms
+    grid_size:100,
+    timestep:50, //ms
 
     //current state
     alive_cells:{
@@ -134,8 +135,10 @@ let app=new Vue({el:"#app",
       return cells;
     },
 
+    //toggle state
     click_cell(i,j){
-      this.set_new_state(i,j,'alive');
+      let alive = this.check_alive(i,j);
+      this.set_new_state(i,j,alive?'dead':'alive');
       this.$forceUpdate();
     },
 
