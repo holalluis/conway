@@ -1,0 +1,204 @@
+<!doctype html><html><head>
+  <meta charset=utf8>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Conway's game of life</title>
+
+  <!--vue
+    development version, includes helpful console warnings
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    production version, optimized for size and speed
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+  -->
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+
+  <style>
+    div.row{
+      display:flex;
+    }
+    div.cell{
+      background:black;
+      height:19px;
+      width:19px;
+      border:1px solid #ccc;
+    }
+    div.cell[alive]{
+      background:white;
+    }
+  </style>
+</head><body>
+<h1>Conway's Game of Life</h1>
+<p>
+  S'apliquen aquestes 2 normes a cada pas:
+  <ol>
+    <li>Si una casella té exactament 3 veïns, viu (casella blanca).
+    <li>Si una casella té menys de 2 veïns, o més de 3 veïns, mor (casella negra).
+  </ol>
+  Pots fer click a una casella negra per fer-la blanca.
+</p><hr>
+
+<div id=app>
+  <div>
+    <div>
+      Simulació:
+      <button @click="start_simulation()" :disabled="running || !Object.values(alive_cells).some(val=>val==true)">inicia</button>
+      <button @click="stop_simulation()" :disabled="!running">stop</button>
+      pas: {{this.current_frame}}
+
+      &emsp;&emsp;
+      <button @click="set_all_random()">tot aleatori</button>
+      <button @click="set_all_dead()">neteja tot</button>
+    </div>
+  </div><hr>
+
+  <!--grid-->
+  <div class=row v-for="i in grid_size">
+    <div
+      class=cell
+      v-for="j in grid_size"
+      :alive="check_alive(i-1,j-1)"
+      @click="click_cell(i-1,j-1)"
+    ></div>
+  </div>
+</div>
+
+<script>
+let app=new Vue({el:"#app",
+  data:{
+    grid_size:40,
+    timestep:150, //ms
+
+    //current state
+    alive_cells:{
+      "2,2":true,
+      "3,3":true,
+      "3,4":true,
+      "2,4":true,
+      "1,4":true,
+    },
+    running:false, //simulation is running
+    current_frame:0, //frames computed
+    interval:false, //value for "setInterval" function
+  },
+
+  methods:{
+    //check if there is a cell in coordinates i,j
+    check_cell(i,j){
+      if(i<0 || j<0) return false;
+      let gs=this.grid_size;
+      if(i>=gs || j>=gs) return false;
+      return true;
+    },
+
+    set_all_random(){
+      let gs=this.grid_size;
+      for(let i=0;i<gs;i++){
+        for(let j=0;j<gs;j++){
+          let random_state = Math.random()>0.5?"alive":"dead";
+          this.set_new_state(i,j,random_state);
+        }
+      }
+      this.$forceUpdate();
+    },
+
+    set_all_dead(){
+      let gs=this.grid_size;
+      for(let i=0;i<gs;i++){
+        for(let j=0;j<gs;j++){
+          this.set_new_state(i,j,'dead');
+        }
+      }
+      this.$forceUpdate();
+    },
+
+    //get array of surrounding positions
+    get_surrounding_cells(i,j){
+      //array of 8 cells around
+      let positions=[
+        {x:i-1, y:j-1}, //nord-oest
+        {x:i-1, y:j  }, //nord
+        {x:i-1, y:j+1}, //nord-est
+        {x:i,   y:j-1}, //oest
+        {x:i,   y:j+1}, //est
+        {x:i+1, y:j-1}, //sud-oest
+        {x:i+1, y:j  }, //sud
+        {x:i+1, y:j+1}, //sud-est
+      ];
+      let cells=[];
+      positions.forEach(p=>{
+        let cell = this.check_cell(p.x,p.y);
+        if(cell) cells.push({x:p.x,y:p.y});
+      });
+      return cells;
+    },
+
+    click_cell(i,j){
+      this.set_new_state(i,j,'alive');
+      this.$forceUpdate();
+    },
+
+    //check if cell i,j is alive
+    check_alive(i,j){
+      let key=`${i},${j}`;
+      let alive_cell = this.alive_cells[key];
+      return alive_cell?true:false;
+    },
+
+    //compute number of alive cells around
+    get_number_of_surrounding_cells_alive(i,j){
+      let sc = this.get_surrounding_cells(i,j);
+      let sca = 0;
+      sc.forEach(cell=>{
+        let alive = this.check_alive(cell.x,cell.y);
+        if(alive) sca++;
+      });
+      return sca;
+    },
+
+    //compute next state of cell i,j
+    get_next_state(i,j){
+      let sca = this.get_number_of_surrounding_cells_alive(i,j);
+      if(sca==3){
+        return "alive";
+      }else if(sca==2){
+        return "same";
+      }else{
+        //less than 2, more than 3
+        return "dead";
+      }
+    },
+
+    //change the state of cell i,j
+    set_new_state(i,j,next_state){
+      if(next_state!='alive' && next_state!='dead') return;
+      let key=`${i},${j}`;
+      this.alive_cells[key] = next_state=="alive";
+    },
+
+    //next frame
+    set_all_next_states(){
+      let cells=[];
+      let gs = this.grid_size;
+      for(let i=0;i<gs;i++){
+        for(let j=0;j<gs;j++){
+          let next_state = this.get_next_state(i,j);
+          cells.push({x:i,y:j,next_state});
+        }
+      }
+      cells.forEach(cell=>{
+        this.set_new_state(cell.x, cell.y, cell.next_state);
+      });
+      this.current_frame++;
+    },
+
+    start_simulation(){
+      this.interval=setInterval(this.set_all_next_states, this.timestep);
+      this.running=true;
+    },
+
+    stop_simulation(){
+      clearInterval(this.interval);
+      this.running=false;
+    },
+  },
+});
+</script>
