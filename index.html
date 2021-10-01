@@ -46,17 +46,15 @@
 <div id=app>
   <!--controls-->
   <div>
-    <div>
-      Simulació:
-      <button @click="start_simulation()" :disabled="running || !Object.values(alive_cells).some(val=>val==true)">inicia</button>
-      <button @click="stop_simulation()" :disabled="!running">stop</button>
-      pas: {{this.current_frame}}
-      &emsp; &emsp; | &emsp; &emsp;
-      <button @click="set_all_next_states()" :disabled="running">+1 pas</button>
-      &emsp; &emsp; | &emsp; &emsp;
-      <button @click="set_all_random()">tot aleatori</button>
-      <button @click="set_all_dead()">neteja tot</button>
-    </div>
+    Simulació:
+    <button @click="start_simulation()" :disabled="running || !Object.values(alive_cells).some(val=>val==true)">inicia</button>
+    <button @click="stop_simulation()" :disabled="!running">stop</button>
+    <code>pas: {{this.current_frame}}</code>
+    &emsp; &emsp; | &emsp; &emsp;
+    <button @click="set_all_next_states()" :disabled="running">+1 pas</button>
+    &emsp; &emsp; | &emsp; &emsp;
+    <button @click="set_all_random()">tot aleatori</button>
+    <button @click="set_all_dead()">neteja tot</button>
   </div><hr>
 
   <!--grid-->
