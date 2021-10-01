@@ -8,28 +8,43 @@
       display:flex;
     }
     div.cell{
-      background:black;
       height:19px;
       width:19px;
+      background:black;
       border:1px solid #ccc;
+      border-top:none;
+      border-left:none;
+    }
+    div.cell:hover{
+      background:yellow;
     }
     div.cell[alive]{
       background:white;
     }
   </style>
 </head><body>
-<h1>Conway's Game of Life</h1>
-<p><a href="https://github.com/holalluis/conway">github.com/holalluis/conway</a></p>
-<p>
-  S'apliquen aquestes 2 normes a cada pas:
-  <ol>
-    <li>Si una casella té exactament 3 veïns, viu (casella blanca).
-    <li>Si una casella té menys de 2 veïns, o més de 3 veïns, mor (casella negra).
-  </ol>
-  Pots fer click a una casella per canviar el seu estat.
-</p><hr>
 
+<!--títol-->
+<div style="display:flex;justify-content:space-between;">
+  <h1>Conway's Game of Life</h1>
+  <div>
+    <a href="https://github.com/holalluis/conway">github.com/holalluis/conway</a>
+  </div>
+</div>
+
+<!--normes-->
+<div>
+  Només hi ha 2 normes durant la simulació:
+  <ol>
+    <li>Si una casella negra té exactament 3 veïns, passa a viure (es torna blanca).</li>
+    <li>Si una casella blanca té menys de 2 veïns o més de 3 veïns, mor (es torna negra).</li>
+  </ol>
+  Pots clicar les caselles per canviar el seu estat.
+</div><hr>
+
+<!--template-->
 <div id=app>
+  <!--controls-->
   <div>
     <div>
       Simulació:
@@ -61,6 +76,7 @@
   </div>
 </div>
 
+<!--logic-->
 <script>
 let app=new Vue({el:"#app",
   data:{
