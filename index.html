@@ -11,8 +11,8 @@
       display:flex;
     }
     div.cell{
-      height:20px;
-      width:20px;
+      height:22px;
+      width:22px;
       background:black;
       box-shadow:0 0 2px #808080;
     }
@@ -21,51 +21,69 @@
       cursor:pointer;
     }
     div.cell:hover{
-      background:yellow;
+      background:lightblue;
     }
   </style>
 </head><body>
 
-<!--títol-->
-<div style="display:flex;justify-content:space-between;">
-  <h1>Conway's Game of Life</h1>
-  <div>
-    <a href="https://github.com/holalluis/conway">github.com/holalluis/conway</a>
+<!--espaiador-->
+<div style="margin-top:4em"></div>
+
+<!--container-->
+<div id=titol_i_normes>
+  <!--títol-->
+  <div style="display:flex;justify-content:space-between;">
+    <h1 style="margin:0">Conway's Game of Life</h1>
+    <div>
+      <a href="https://github.com/holalluis/conway">github.com/holalluis/conway</a>
+    </div>
+  </div><hr>
+  <!--normes-->
+  <div id=normes>
+    Només hi ha 2 normes durant la simulació:
+    <ol>
+      <li>Si una casella negra té 3 veïns, es torna blanca (viu).
+      <li>Una casella blanca es torna negra (mor) si:
+        <ul>
+          <li>Té menys de 2 veïns.
+          <li>Té més de 3 veïns.
+        </ul>
+      </li>
+    </ol>
+    Pots clicar les caselles per canviar el seu estat (i dibuixar).
+    <button onclick="document.querySelector('#titol_i_normes').style.display='none'">ok</button>
+    <hr>
   </div>
 </div>
-
-<!--normes-->
-<div>
-  Només hi ha 2 normes durant la simulació:
-  <ol>
-    <li>Si una casella negra té exactament 3 veïns, passa a viure (es torna blanca).</li>
-    <li>Si una casella blanca té menys de 2 veïns o més de 3 veïns, mor (es torna negra).</li>
-  </ol>
-  Pots clicar les caselles per canviar el seu estat.
-</div><hr>
 
 <!--template-->
 <div id=app>
   <!--controls-->
-  <div>
+  <div
+    style="
+      position:fixed;
+      top:0;
+      width:100%;
+      font-family:monospace;
+      padding:1em 0;
+      padding-left:8px;
+      margin-left:-8px;
+      border-bottom:1px solid #ccc;
+      background:lightblue;
+    "
+  >
     Simulació:
     <button @click="start_simulation()" :disabled="running || !Object.values(alive_cells).some(val=>val==true)">inicia</button>
-    <button @click="stop_simulation()" :disabled="!running">pausa</button>
-    |
-    <code :style="{background:running?'yellow':''}">pas: {{this.current_frame}}</code>
-    |
-    <button @click="set_all_next_states()" :disabled="running">+1 pas</button>
-    |
-    <button @click="set_all_dead()">neteja tot</button>
-    |
-    <button @click="set_all_random()">tot aleatori</button>
-    |
+    <button @click="stop_simulation()" :disabled="!running">pausa</button> |
+    <span :style="{background:running?'yellow':'',width:'75px',display:'inline-block',textAlign:'center'}">Pas: {{this.current_frame}}</span> |
+    <button @click="set_all_next_states()" :disabled="running">+1 pas</button> |
+    <button @click="set_all_dead()">neteja tot</button> |
+    <button @click="set_all_random()">tot aleatori</button> |
     Tamany:
     <button @click="grid_size-=5">-5</button>
     {{grid_size}}x{{grid_size}}
     <button @click="grid_size+=5">+5</button>
-    |
-  </div><hr>
+  </div>
 
   <!--grid-->
   <div
@@ -136,9 +154,8 @@ let app=new Vue({el:"#app",
       this.$forceUpdate();
     },
 
-    //get array of surrounding positions
+    //get array of 8 cells surrounding position i,j
     get_surrounding_cells(i,j){
-      //array of 8 cells around
       let positions=[
         {x:i-1, y:j-1}, //nord-oest
         {x:i-1, y:j  }, //nord
