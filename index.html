@@ -82,7 +82,11 @@
     Tamany:
     <button @click="grid_size-=5">-5</button>
     {{grid_size}}x{{grid_size}}
-    <button @click="grid_size+=5">+5</button>
+    <button :disabled="running" @click="grid_size+=5">+5</button> |
+    <button :disabled="running" @click="move_all_left()">&larr;</button>
+    <button :disabled="running" @click="move_all_down()">&darr;</button>
+    <button :disabled="running" @click="move_all_up()">&uarr;</button>
+    <button :disabled="running" @click="move_all_right()">&rarr;</button>
   </div>
 
   <!--grid-->
@@ -110,13 +114,44 @@ let app=new Vue({el:"#app",
     timestep:100, //ms entre frames
     paint_mode:false, //drag mouse mode per pintar els quadres
 
-    //current state
+    //initial state
     alive_cells:{
-      "2,2":true,
-      "3,3":true,
-      "3,4":true,
-      "2,4":true,
-      "1,4":true,
+      "1,25":true,
+      "2,23":true,
+      "2,25":true,
+      "3,13":true,
+      "3,14":true,
+      "3,21":true,
+      "3,22":true,
+      "3,35":true,
+      "3,36":true,
+      "4,12":true,
+      "4,16":true,
+      "4,21":true,
+      "4,22":true,
+      "4,35":true,
+      "4,36":true,
+      "5,1":true,
+      "5,2":true,
+      "5,11":true,
+      "5,17":true,
+      "5,21":true,
+      "5,22":true,
+      "6,1":true,
+      "6,2":true,
+      "6,11":true,
+      "6,15":true,
+      "6,17":true,
+      "6,18":true,
+      "6,23":true,
+      "6,25":true,
+      "7,11":true,
+      "7,17":true,
+      "7,25":true,
+      "8,12":true,
+      "8,16":true,
+      "9,13":true,
+      "9,14":true,
     },
     running:false, //simulation is running
     current_frame:0, //frames computed
@@ -130,6 +165,70 @@ let app=new Vue({el:"#app",
       let gs=this.grid_size;
       if(i>=gs || j>=gs) return false;
       return true;
+    },
+
+    move_all_up(){
+      let new_keys=[];
+      Object.entries(this.alive_cells).forEach(([key,val])=>{
+        if(!val) return;
+        let ij = key.split(',');
+        let i = parseInt(ij[0]);
+        let j = parseInt(ij[1]);
+        if(i<1) return;
+        new_keys.push(`${i-1},${j}`);
+      });
+      this.alive_cells={};
+      new_keys.forEach(key=>{
+        this.alive_cells[key]=true;
+      });
+    },
+
+    move_all_down(){
+      let new_keys=[];
+      Object.entries(this.alive_cells).forEach(([key,val])=>{
+        if(!val) return;
+        let ij = key.split(',');
+        let i = parseInt(ij[0]);
+        let j = parseInt(ij[1]);
+        if(i>=this.grid_size-1) return;
+        new_keys.push(`${i+1},${j}`);
+      });
+      this.alive_cells={};
+      new_keys.forEach(key=>{
+        this.alive_cells[key]=true;
+      });
+    },
+
+    move_all_left(){
+      let new_keys=[];
+      Object.entries(this.alive_cells).forEach(([key,val])=>{
+        if(!val) return;
+        let ij = key.split(',');
+        let i = parseInt(ij[0]);
+        let j = parseInt(ij[1]);
+        if(j<1) return;
+        new_keys.push(`${i},${j-1}`);
+      });
+      this.alive_cells={};
+      new_keys.forEach(key=>{
+        this.alive_cells[key]=true;
+      });
+    },
+
+    move_all_right(){
+      let new_keys=[];
+      Object.entries(this.alive_cells).forEach(([key,val])=>{
+        if(!val) return;
+        let ij = key.split(',');
+        let i = parseInt(ij[0]);
+        let j = parseInt(ij[1]);
+        if(j>=this.grid_size-1) return;
+        new_keys.push(`${i},${j+1}`);
+      });
+      this.alive_cells={};
+      new_keys.forEach(key=>{
+        this.alive_cells[key]=true;
+      });
     },
 
     set_all_random(){
