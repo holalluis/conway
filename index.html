@@ -38,19 +38,20 @@
       <a href="https://github.com/holalluis/conway">github.com/holalluis/conway</a>
     </div>
   </div><hr>
+
   <!--normes-->
   <div id=normes>
     Només hi ha 2 normes durant la simulació:
     <ol>
-      <li>Si una casella negra té 3 veïns, es torna blanca (viu).
-      <li>Una casella blanca es torna negra (mor) si:
+      <li>Una casella negra es tornarà blanca si té 3 veïns.
+      <li>Una casella blanca es tornarà negra si:
         <ul>
           <li>Té menys de 2 veïns.
           <li>Té més de 3 veïns.
         </ul>
       </li>
     </ol>
-    Pots clicar les caselles per canviar el seu estat (i dibuixar).
+    Pots fer click a les caselles per canviar el seu color.
     <button onclick="document.querySelector('#titol_i_normes').style.display='none'">ok</button>
     <hr>
   </div>
@@ -83,6 +84,7 @@
     <button @click="grid_size-=5">-5</button>
     {{grid_size}}x{{grid_size}}
     <button :disabled="running" @click="grid_size+=5">+5</button> |
+    Mou:
     <button :disabled="running" @click="move_all_left()">&larr;</button>
     <button :disabled="running" @click="move_all_down()">&darr;</button>
     <button :disabled="running" @click="move_all_up()">&uarr;</button>
@@ -114,7 +116,7 @@ let app=new Vue({el:"#app",
     timestep:100, //ms entre frames
     paint_mode:false, //drag mouse mode per pintar els quadres
 
-    //initial state
+    //initial state ("Gosper's glider gun")
     alive_cells:{
       "1,25":true,
       "2,23":true,
